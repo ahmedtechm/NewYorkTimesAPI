@@ -11,7 +11,6 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
@@ -47,34 +46,35 @@ public class Main {
 
                     in.close();
 
+                    // Parse the JSON response using Jackson
                     ObjectMapper objectMapper = new ObjectMapper();
                     JsonNode jsonNode = objectMapper.readTree(response.toString());
 
-// Extract the relevant information from the JSON response
+                    // Extract the relevant information from the JSON response
                     JsonNode docsNode = jsonNode.get("response").get("docs");
                     for (JsonNode docNode : docsNode) {
 
-                        String ID = docNode.get("ID").asText();
-                        String title = docNode.get("Title").asText();
-                        String author = docNode.get("Author").asText();
-                        String date = docNode.get("Date").asText();
-                        String category = docNode.get("Category").asText();
-                        String content = docNode.get("Content").asText();
+                        String ID = docNode.get("ID").get("main").asText();
+                        String Title = docNode.get("Title").asText();
+                        String Author = docNode.get("Author").asText();
+                        String Date = docNode.get("Date").asText();
+                        String Category = docNode.get("Category").asText();
+                        String Content = docNode.get("Content").asText();
 
                         // Insert the relevant information into the SQL Server database using JDBC
-                        try (Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=ArticlesDB", "sa", "root")) {
-                            PreparedStatement stmt = conn.prepareStatement("INSERT INTO articles (ID, Title, Author, Date, Category, Content) VALUES (?, ?, ?, ?, ?, ?)");
-                            stmt.setString(1, ID);
-                            stmt.setString(2, title);
-                            stmt.setString(3, author);
-                            stmt.setString(4, date);
-                            stmt.setString(5, category);
-                            stmt.setString(6, content);
-                            stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            // Handle the exception appropriately
-                        }
+                        Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=ArticlesDB", "sa", "root");
+                        PreparedStatement stmt = conn.prepareStatement("INSERT INTO articles (ID, Title, Author, Date, Category, Content) VALUES (?, ?, ?, ?, ?, ?)");
+                        stmt.setString(1, ID);
+                        stmt.setString(2, Title);
+                        stmt.setString(3, Author);
+                        stmt.setString(4, Date);
+                        stmt.setString(5, Category);
+                        stmt.setString(6, Content);
+                        stmt.executeUpdate();
+                        stmt.close();
+                        conn.close();
                     }
+
 
                 } else {
                     // If there was an error, print the response code
