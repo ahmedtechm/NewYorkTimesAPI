@@ -1,5 +1,8 @@
 package org.example;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -40,7 +43,20 @@ public class Main {
 
                     in.close();
 
-                    System.out.println(response.toString());
+                    // Parse the JSON response using Jackson
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode rootNode = objectMapper.readTree(response.toString());
+
+                    // Extract the articles from the JSON response
+                    JsonNode articlesNode = rootNode.path("response").path("docs");
+
+                    // Iterate over the articles and print their titles and URLs
+                    for (JsonNode articleNode : articlesNode) {
+                        String title = articleNode.path("headline").path("main").asText();
+                        String url1 = articleNode.path("web_url").asText();
+                        System.out.println(title + " - " + url1);
+                    }
+
                 } else {
                     // If there was an error, print the response code
                     System.out.println("Error: " + responseCode);
@@ -48,7 +64,6 @@ public class Main {
 
                 sc.close();
             }
-
-        }
+}
 
  
