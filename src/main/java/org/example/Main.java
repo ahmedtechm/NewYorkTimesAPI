@@ -54,26 +54,30 @@ public class Main {
                     JsonNode docsNode = jsonNode.get("response").get("docs");
                     for (JsonNode docNode : docsNode) {
 
-                        String ID = docNode.get("ID").get("main").asText();
-                        String Title = docNode.get("Title").asText();
-                        String Author = docNode.get("Author").asText();
-                        String Date = docNode.get("Date").asText();
-                        String Category = docNode.get("Category").asText();
-                        String Content = docNode.get("Content").asText();
+                        String abstractItem = docNode.get("abstract").get("main").asText();
+                        String webUrl = docNode.get("web_url").asText();
+                        String snippet = docNode.get("snippet").asText();
+                        String leadParagraph = docNode.get("lead_paragraph").asText();
+                        String printSection = docNode.get("print_section").asText();
+                        String printPage = docNode.get("print_page").asText();
+                        String source = docNode.get("source").asText();
 
                         // Insert the relevant information into the SQL Server database using JDBC
                         Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=ArticlesDB", "sa", "root");
-                        PreparedStatement stmt = conn.prepareStatement("INSERT INTO articles (ID, Title, Author, Date, Category, Content) VALUES (?, ?, ?, ?, ?, ?)");
-                        stmt.setString(1, ID);
-                        stmt.setString(2, Title);
-                        stmt.setString(3, Author);
-                        stmt.setString(4, Date);
-                        stmt.setString(5, Category);
-                        stmt.setString(6, Content);
+                        PreparedStatement stmt = conn.prepareStatement("INSERT INTO docs (abstract, webUrl, snippet, leadParagraph, printSection, printPage,source) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        stmt.setString(1, abstractItem);
+                        stmt.setString(2, webUrl);
+                        stmt.setString(3, snippet);
+                        stmt.setString(4, leadParagraph);
+                        stmt.setString(5, printSection);
+                        stmt.setString(6, printPage);
+                        stmt.setString(7, source);
                         stmt.executeUpdate();
                         stmt.close();
                         conn.close();
                     }
+
+
 
 
                 } else {
